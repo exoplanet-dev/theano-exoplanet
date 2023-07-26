@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: ["3.6", "3.7"]
+        python-version: ["3.9", "3.10"]
         fast-compile: [0]
         float32: [0]
         part:
@@ -65,27 +65,27 @@ jobs:
           - "tests/tensor/nnet --ignore-glob='*/test_abstract_conv.py'"
           - "tests/tensor/nnet/test_abstract_conv.py"
         include:
-          - python-version: "3.7"
+          - python-version: "3.10"
             fast-compile: 1
             float32: 1
             part: "tests --ignore=tests/tensor/nnet --ignore=tests/tensor/signal"
-          - python-version: "3.7"
+          - python-version: "3.10"
             fast-compile: 1
             float32: 0
             part: "tests --ignore=tests/tensor/nnet --ignore=tests/tensor/signal"
-          - python-version: "3.7"
+          - python-version: "3.10"
             fast-compile: 1
             float32: 1
             part: "tests/tensor/nnet"
-          - python-version: "3.7"
+          - python-version: "3.10"
             fast-compile: 1
             float32: 0
             part: "tests/tensor/nnet"
-          - python-version: "3.7"
+          - python-version: "3.10"
             fast-compile: 1
             float32: 1
             part: "tests/tensor/signal"
-          - python-version: "3.7"
+          - python-version: "3.10"
             fast-compile: 1
             float32: 0
             part: "tests/tensor/signal"
@@ -168,7 +168,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
