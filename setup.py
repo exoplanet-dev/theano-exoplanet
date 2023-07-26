@@ -9,17 +9,17 @@ def read_file(filename):
         return buff.read()
 
 
-NAME = "Theano-PyMC"
-MAINTAINER = "PyMC developers"
-MAINTAINER_EMAIL = "pymc-devs@gmail.com"
+NAME = "theano-exoplanet"
+MAINTAINER = "Dan Foreman-Mackey"
+MAINTAINER_EMAIL = "dfm@dfm.io"
 DESCRIPTION = (
     "Optimizing compiler for evaluating mathematical expressions on CPUs and GPUs."
 )
 LONG_DESCRIPTION = read_file("DESCRIPTION.txt")
-URL = "http://deeplearning.net/software/theano/"
+URL = "https://github.com/exoplanet-dev/theano-exoplanet"
 LICENSE = "BSD"
-AUTHOR = "pymc-devs"
-AUTHOR_EMAIL = "pymc-devs@gmail.com"
+AUTHOR = "Dan Foreman-Mackey"
+AUTHOR_EMAIL = "dfm@dfm.io"
 PLATFORMS = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"]
 CLASSIFIERS = """\
 Development Status :: 6 - Mature

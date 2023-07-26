@@ -20,7 +20,7 @@ import time
 import warnings
 from io import BytesIO, StringIO
 
-import numpy.distutils
+import numpy as np
 
 import theano
 
@@ -1632,7 +1632,7 @@ def get_gcc_shared_library_arg():
 
 
 def std_include_dirs():
-    numpy_inc_dirs = numpy.distutils.misc_util.get_numpy_include_dirs()
+    numpy_inc_dirs = [np.get_include()]
     py_inc = distutils.sysconfig.get_python_inc()
     py_plat_spec_inc = distutils.sysconfig.get_python_inc(plat_specific=True)
     python_inc_dirs = (
@@ -2611,32 +2611,9 @@ def default_blas_ldflags():
     str
 
     """
-    import numpy.distutils  # noqa
-
     warn_record = []
     try:
-        if hasattr(numpy.distutils, "__config__") and numpy.distutils.__config__:
-            # If the old private interface is available use it as it
-            # don't print information to the user.
-            blas_info = numpy.distutils.__config__.blas_opt_info
-        else:
-            # We do this import only here, as in some setup, if we
-            # just import theano and exit, with the import at global
-            # scope, we get this error at exit: "Exception TypeError:
-            # "'NoneType' object is not callable" in <bound method
-            # Popen.__del__ of <subprocess.Popen object at 0x21359d0>>
-            # ignored"
-
-            # This happen with Python 2.7.3 |EPD 7.3-1 and numpy 1.8.1
-            # isort: off
-            import numpy.distutils.system_info  # noqa
-
-            # We need to catch warnings as in some cases NumPy print
-            # stuff that we don't want the user to see.
-            # I'm not able to remove all printed stuff
-            with warnings.catch_warnings(record=True):
-                numpy.distutils.system_info.system_info.verbosity = 0
-                blas_info = numpy.distutils.system_info.get_info("blas_opt")
+        blas_info = np.__config__.get_info("blas_opt")
 
         # If we are in a EPD installation, mkl is available
         if "EPD" in sys.version:
@@ -2648,7 +2625,7 @@ def default_blas_ldflags():
                     # Why on Windows, the library used are not the
                     # same as what is in
                     # blas_info['libraries']?
-                    [f"-l{l}" for l in ["mk2_core", "mk2_intel_thread", "mk2_rt"]]
+                    [f"-l{l}" for l in ("mk2_core", "mk2_intel_thread", "mk2_rt")]
                 )
             elif sys.platform == "darwin":
                 # The env variable is needed to link with mkl
@@ -2669,7 +2646,7 @@ def default_blas_ldflags():
                         "The environment variable "
                         "'DYLD_FALLBACK_LIBRARY_PATH' does not contain "
                         "the '{new_path}' path in its value. This will make "
-                        "Theano use a slow version of BLAS. Update "
+                        "Aesara use a slow version of BLAS. Update "
                         "'DYLD_FALLBACK_LIBRARY_PATH' to contain the "
                         "said value, this will disable this warning."
                     )
@@ -2721,7 +2698,7 @@ def default_blas_ldflags():
                     +
                     # Why on Windows, the library used are not the
                     # same as what is in blas_info['libraries']?
-                    [f"-l{l}" for l in ["mk2_core", "mk2_intel_thread", "mk2_rt"]]
+                    [f"-l{l}" for l in ("mk2_core", "mk2_intel_thread", "mk2_rt")]
                 )
 
         # MKL
@@ -2731,9 +2708,8 @@ def default_blas_ldflags():
         # numpy and scipy.
         try:
             import mkl  # noqa
-        except ImportError as e:
-            if any([m for m in ("conda", "Continuum") if m in sys.version]):
-                warn_record.append(f"install mkl with `conda install mkl-service`: {e}")
+        except ImportError:
+            pass
         else:
             # This branch is executed if no exception was raised
             if sys.platform == "win32":
@@ -2749,13 +2725,13 @@ def default_blas_ldflags():
             else:
                 thr = "mkl_intel_thread"
             base_flags = list(flags)
-            flags += [f"-l{l}" for l in ["mkl_core", thr, "mkl_rt"]]
+            flags += [f"-l{l}" for l in ("mkl_core", thr, "mkl_rt")]
             res = try_blas_flag(flags)
 
             if not res and sys.platform == "win32" and thr == "mkl_gnu_thread":
                 # Check if it would work for intel OpenMP on windows
                 flags = base_flags + [
-                    f"-l{l}" for l in ["mkl_core", "mkl_intel_thread", "mkl_rt"]
+                    f"-l{l}" for l in ("mkl_core", "mkl_intel_thread", "mkl_rt")
                 ]
                 res = try_blas_flag(flags)
 
@@ -2767,7 +2743,7 @@ def default_blas_ldflags():
             res = try_blas_flag(flags)
             if res:
                 check_mkl_openmp()
-                theano.utils.maybe_add_to_os_environ_pathlist("PATH", lib_path[0])
+                maybe_add_to_os_environ_pathlist("PATH", lib_path[0])
                 return res
 
         # to support path that includes spaces, we need to wrap it with double quotes on Windows
